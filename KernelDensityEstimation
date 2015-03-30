@@ -1,0 +1,12 @@
+#ifndef KERNEL_DENSITY_ESTIMATION_MODULE
+#define KERNEL_DENSITY_ESTIMATION_MODULE
+
+#include <cmath>
+#include <cassert>
+#include <cstdlib>
+
+#include <Eigen/Core>
+
+#include "src/KernelDensityEstimation.hpp"
+
+#endif//KERNEL_DENSITY_ESTIMATION_MODULE
