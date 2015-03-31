@@ -4,9 +4,11 @@
 #include <cmath>
 #include <cassert>
 #include <cstdlib>
+#include <iostream>
 
 #include <Eigen/Core>
+#include <Eigen/Dense>
 
-#include "src/KernelDensityEstimation.hpp"
+#include "src/Gaussian.hpp"
 
 #endif//KERNEL_DENSITY_ESTIMATION_MODULE
