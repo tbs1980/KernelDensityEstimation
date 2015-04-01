@@ -4,7 +4,7 @@
 namespace kde
 {
 
-    template<realScalarType>
+    template<typename realScalarType>
     realScalarType GaussPDF(realScalarType const& x,
         realScalarType const& mu, realScalarType const& sigma)
     {
@@ -39,7 +39,7 @@ namespace kde
         }
     };
 
-    template<typename _realSclarType>
+    template<typename _realScalarType>
     class OptimalBandwidthEquation
     {
     public:
@@ -63,7 +63,7 @@ namespace kde
             realScalarType const min, realScalarType const max,
             realVectorType const & data)
         {
-            realScalarType epsilon = ;
+            realScalarType epsilon = 1e-4;
             realScalarType cnt(1);
             realScalarType dx = (max - min)/cnt;
             realScalarType curveMax = curvature(max,w,data);;
@@ -81,10 +81,10 @@ namespace kde
                 {
                     realScalarType curveVal = curvature(min + i*dx, w, data);
                     curveMin = curveVal*curveVal;
-                    y += curv_mn;
+                    y += curveMin;
                 }
                 yy = 0.5*yy + y*dx;
-                if(n > 8 && std::abs(y*dx-0.5*yy) < eps*yy)
+                if(n > 8 && std::abs(y*dx-0.5*yy) < epsilon*yy)
                 {
                     break;
                 }
@@ -110,16 +110,11 @@ namespace kde
             realScalarType z = (x - m)/s;
             return ((z*z) - 1.0)*GussPDF(x,m,s)/(s*s);
         }
-
-
-    }
+    };
 
     class OptimalBandwidth
     {
     public:
-
-
-
         template<class realMatrixType,class realVectorType>
         static void compute(realMatrixType const& dataMatrix,
             realVectorType & bandwidth)
@@ -135,9 +130,13 @@ namespace kde
             for(indexType i=0;i<bandwidth.rows();++i)
             {
                 realScalarType x0 = defBw(i);
+                realScalarType y0 =
+                    OptimalBandwidthEquation<realScalarType>::evaluate(x0,
+                        dataMatrix.col(i).min(),dataMatrix.col(i).max(),
+                        dataMatrix.col(i));
             }
         }
-    }
+    };
 
 
     template<typename _realScalarType>
