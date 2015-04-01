@@ -1,6 +1,8 @@
 #include <KernelDensityEstimation>
 
 #include <random>
+#include <fstream>
+#include <iomanip>
 
 template<typename _realScalarType>
 class GaussPost
@@ -66,33 +68,46 @@ int testInit()
     typedef realMatrixType::Index indexType;
 
     //define the Gaussian posterior
-    const indexType numDims=2;
+    const indexType numDims=10;
     realMatrixType sigmaInv = realMatrixType::Identity(numDims,numDims);
     realVectorType mu = realVectorType::Zero(numDims);
     GaussPostType gp(mu,sigmaInv,1234l);
 
     //samples and dimensionality
-    const indexType numSamples=1000;
+    const indexType numSamples=3000;
 
 
     //generate samples
+    std::ofstream outFile;
+    outFile.open("ndSamples.txt",std::ios::trunc);
+
     realMatrixType samples(numSamples,numDims);
     for(indexType i=0;i<numSamples;++i)
     {
         realVectorType samp = gp.generate();
         samples.row(i) = samp;
+        /*
+        for(indexType j=0;j<samp.rows()-1;++j)
+        {
+            outFile<<std::setprecision(10)<<samp(j)<<",";
+        }
+        outFile<<std::setprecision(10)<<samp(samp.rows()-1)<<std::endl;
+        */
     }
+    outFile.close();
 
     kernelDensityEstimationType kde(samples);
 
     for(indexType i=0;i<numSamples;++i)
     {
         realVectorType samp = gp.generate();
+
         for(indexType j=0;j<samp.rows();++j)
         {
             std::cout<<samp(j)<<",";
         }
-        std::cout<<gp.logPost(samp)<<","<<kde.PDF(samp)<<std::endl;
+        std::cout<<gp.logPost(samp)<<","<<std::log(kde.PDF(samp))<<std::endl;
+
     }
 
     return EXIT_SUCCESS;

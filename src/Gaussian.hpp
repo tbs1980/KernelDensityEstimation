@@ -30,7 +30,7 @@ namespace kde
             {
                 realScalarType cnt = (realScalarType) dataMatrix.rows();
                 realScalarType mean = dataMatrix.col(i).mean();
-                realScalarType sqMean = dataMatrix.col(i).squaredNorm();
+                realScalarType sqMean = dataMatrix.col(i).squaredNorm()/cnt;
                 realScalarType sigma = std::sqrt(sqMean - mean*mean);
                 bandwidth(i) = sigma*std::pow(realScalarType(3.)*cnt/realScalarType(4.),
                     realScalarType(-1./5.));
@@ -52,7 +52,7 @@ namespace kde
         static realScalarType evaluate(realScalarType const w, realScalarType const min,
             realScalarType const max, realVectorType const & data)
         {
-            realScalarType alpha = realScalarType(1.)/(realScalarType(2.)*std::sqrt(M_PI)) ;
+            realScalarType alpha = realScalarType(1.)/( realScalarType(2.)*std::sqrt(M_PI) ) ;
             realScalarType sigma = realScalarType(1.);
             realScalarType n = (realScalarType) data.rows();
             realScalarType q = stiffnessIntegral(w,min,max,data);
@@ -69,7 +69,7 @@ namespace kde
             realScalarType curveMax = curvature(max,w,data);;
             realScalarType curveMin = curvature(max,w,data);
             realScalarType yy = 0.5*(curveMax*curveMax + curveMin*curveMin)*dx;
-            realScalarType maxN = (max - min)/cnt;
+            realScalarType maxN = (max - min)/std::sqrt(epsilon);
 
             maxN  = maxN > 2048 ? 2048 : maxN;
 
@@ -108,7 +108,7 @@ namespace kde
             realScalarType const m, realScalarType const s)
         {
             realScalarType z = (x - m)/s;
-            return ((z*z) - 1.0)*GussPDF(x,m,s)/(s*s);
+            return ((z*z) - 1.0)*GaussPDF(x,m,s)/(s*s);
         }
     };
 
@@ -122,18 +122,40 @@ namespace kde
             typedef typename realMatrixType::Scalar realScalarType;
             typedef typename realMatrixType::Index indexType;
 
+            const indexType maxIter = 25;
+            const realScalarType epsilon(1e-03);
+            const realScalarType extension(3);
+
             assert(dataMatrix.cols() == bandwidth.rows());
 
-            realVectorType defBw(bandwidth);
-            classicBandwidth::compute(dataMatrix,defBw);
+            classicBandwidth::compute(dataMatrix,bandwidth);
 
             for(indexType i=0;i<bandwidth.rows();++i)
             {
-                realScalarType x0 = defBw(i);
+                realScalarType dataMin = dataMatrix.col(i).minCoeff() - extension*bandwidth(i);
+                realScalarType dataMax = dataMatrix.col(i).maxCoeff() + extension*bandwidth(i);
+                realScalarType x0 = bandwidth(i);
                 realScalarType y0 =
                     OptimalBandwidthEquation<realScalarType>::evaluate(x0,
-                        dataMatrix.col(i).min(),dataMatrix.col(i).max(),
-                        dataMatrix.col(i));
+                        dataMin,dataMax,dataMatrix.col(i));
+                realScalarType x = 0.8*x0;
+                realScalarType y =
+                    OptimalBandwidthEquation<realScalarType>::evaluate(x,
+                        dataMin,dataMax,dataMatrix.col(i));
+                indexType iter = 0;
+
+                while(iter < maxIter)
+                {
+                    x -= y*(x0-x)/(y0-y);
+                    y = OptimalBandwidthEquation<realScalarType>::evaluate(x,
+                            dataMin,dataMax,dataMatrix.col(i));
+                    if(std::abs(y) < epsilon*y0)
+                    {
+                        break;
+                    }
+                }
+
+                bandwidth(i) = x;
             }
         }
     };
@@ -153,6 +175,14 @@ namespace kde
         :mDataMatrix(dataMatrix),mBandwidth(mDataMatrix.cols())
         {
             classicBandwidth::compute(mDataMatrix,mBandwidth);
+            //OptimalBandwidth::compute(mDataMatrix,mBandwidth);
+
+            /*
+            for(indexType i=0;i<mBandwidth.rows();++i)
+            {
+                std::cout<<"bandwidth "<<i<<" = "<<mBandwidth(i)<<std::endl;
+            }
+            */
         }
 
         realScalarType PDF(realVectorType const& x)
