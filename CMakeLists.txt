@@ -14,4 +14,6 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra -Wfatal-errors")
 
+ENABLE_TESTING()
+
 add_subdirectory(test)

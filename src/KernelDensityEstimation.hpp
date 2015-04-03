@@ -1,94 +1,66 @@
-#ifndef KERNELDENSITYESTIMATION_HPP
-#define KERNELDENSITYESTIMATION_HPP
+#ifndef KDE_KERNELDENSITYESTIMATION_HPP
+#define KDE_KERNELDENSITYESTIMATION_HPP
 
-enum GaussBandwidthOptimisation
+namespace kde
 {
-    DEFAULT,
-    SECANT,
-    BISECTION
-};
-
-enum Kernel
-{
-    GAUSS,
-    BOX,
-    EPANECHNIKOV
-};
-
-enum Density
-{
-    PDF,
-    CDF
-};
-
-/**
- * \brief A class for computing Kernel Density Estimation
- *
- * Based on https://github.com/timnugent/kernel-density
- */
-template<typename _realScalarType>
-class kernelDensityEstimationBase
-{
-public:
-    typedef _realScalarType realScalarType;
-    typedef Eigen::Matrix<realScalarType,Eigen::Dynamic,Eigen::Dynamic> realMatrixType;
-    typedef Eigen::Matrix<realScalarType,1,Eigen::Dynamic> realVectorType;
-
-    kernelDensityEstimationBase(realMatrixType const& dataMatrix)
-    :mDataMatrix(dataMatrix)
+    /**
+     * \class KernelDensityEstimator
+     *
+     * \brief A class for estimating kernel density from a set samples
+     *
+     * \tparam kernelType type of kernel
+     * \tparam bandwidthType type of bandwith
+     * \tparam neighboursType type of neighbours
+     *
+     * This class estimates the kernel density of a set of samples using
+     * specified kernel, bandwidth and negighbours. The kernel density can be
+     * written as \f$ \hat{f}_{\mathbf{H}}(\mathbf{x})
+     * = \frac{1}{n} \sum_{i=1}^n K_{\mathbf{H}}(\mathbf{x} - \mathbf{x}_i) \f$.
+     *
+     */
+    template<class kernelType,class bandwidthType,class neighboursType>
+    class KernelDensityEstimator
     {
-        assert(dataMatrix.rows()>0 and dataMatrix.cols()>0);
-        mBandwidth = realVectorType::Ones(dataMatrix.cols())*realScalarType(-1);
-    }
+    public:
 
-protected:
-    realMatrixType mDataMatrix;
-    realVectorType mBandwidth;
-};
+        typedef typename kernelType::realScalarType realScalarType;
+        typedef typename kernelType::realVectorType realVectorType;
+        typedef typename bandwidthType::realMatrixType realMatrixType;
+        typedef typename bandwidthType::indexType indexType;
+        typedef typename neighboursType::neighbourIndexVectorType neighbourIndexVectorType;
 
-template<typename _realScalarType,int KernelType,int BandOptType>
-class kernelDensityEstimation : public kernelDensityEstimationBase<_realScalarType>
-{};
-
-
-template<typename _realScalarType>
-class kernelDensityEstimation<_realScalarType,GAUSS,DEFAULT>
-    : public kernelDensityEstimationBase<_realScalarType>
-{
-public:
-    typedef kernelDensityEstimationBase<_realScalarType> KDEBaseType;
-    typedef typename KDEBaseType::realScalarType realScalarType;
-    typedef typename KDEBaseType::realMatrixType realMatrixType;
-    typedef typename KDEBaseType::realVectorType realVectorType;
-
-    kernelDensityEstimation(realMatrixType const& dataMatrix)
-    :KDEBaseType(dataMatrix)
-    {
-
-    }
-
-    realScalarType pdf(realVectorType const & x) const
-    {
-        assert(x.rows() == KDEBaseType::mDataMatrix.cols());
-
-        for(size_t i=0;i<KDEBaseType::dataMatrix.rows();++i)
+        /**
+         * \brief A constructor that sets up the class
+         * \param data the input data
+         */
+        explicit KernelDensityEstimator(realMatrixType const & data)
+        :mData(data),mBandwidth(data),mNeighbours(data)
         {
-            realScalarType a(1);
-            for(size_t j=0;j<x.rows();++j)
-            {
-                a *= pdfAt(x(j),KDEBaseType::mDataMatrix(i,j),KDEBaseType::mBandwidth(j));
-            }
         }
+
+        /**
+         * \brief A function that returns the PDF at the spcified point
+         * \param x the point at which the PDF is sought
+         * \return the value of the PDF
+         */
+        realScalarType compute(realVectorType const& x)
+        {
+            realScalarType pdf = 0;
+            neighbourIndexVectorType nIVect = mNeighbours.neighbours(x);
+            for(indexType i=0;i<nIVect.rows();++i)
+            {
+                indexType ni = nIVect(i)
+                pdf += kernelType::compute((x - mData.col(ni)));
+            }
+            pdf /= (realScalarType)nIVect.rows();
+            return pdf;
+        }
+
+    private:
+        realMatrixType mData; /**< data */
+        bandwidthType mBandwidth; /**< bandwidth matrix */
+        neighboursType mNeighbours; /**< neighbours */
     }
+}//namespace kde
 
-private:
-
-    realScalarType pdfAt(realScalarType const x, realScalarType const mu, realScalarType const sigma) const
-    {
-        realScalarType z = (x - mu)/sigma;
-        return std::exp(-realScalarType(0.5)*z*z)
-            /(sigma*std::sqrt( realScalarType(2.)*M_PI));
-    }
-};
-
-#endif //KERNELDENSITYESTIMATION_HPP
+#endif //KDE_KERNELDENSITYESTIMATION_HPP
