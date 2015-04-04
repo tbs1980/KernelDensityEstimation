@@ -77,15 +77,15 @@ namespace kde
             for(indexType i=0;i<data.cols();++i)
             {
                 //find std-dvn of each dimension
-                realScalarType numDims = data.cols();
+                realScalarType numDims = (realScalarType) data.cols();
                 realScalarType count = (realScalarType) data.rows();
                 realScalarType mean = data.col(i).mean();
                 realScalarType sqMean = data.col(i).squaredNorm()/count;
                 realScalarType sigma = std::sqrt(sqMean - mean*mean);
                 //compute the bandwidth for each dimension using Silverman 1986
-                bandwidthMatrix(i) = std::pow(realScalarType(4./(numDims+2.)),
-                realScalarType(-1./(numDims+4.)) )
-                    * std::pow(count,realScalarType(1./(numDims+4.)))
+                bandwidthMatrix(i) = std::pow( realScalarType(4.)/realScalarType(numDims+2.),
+                realScalarType(-1.)/realScalarType(numDims+4.) )
+                    * std::pow(count,realScalarType(1.)/realScalarType(numDims+4.) )
                     / sigma ;
                 norm *= bandwidthMatrix(i);
             }
