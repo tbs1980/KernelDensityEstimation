@@ -31,20 +31,9 @@ namespace kde
          * \param data input data
          */
         explicit DiagonalBandwidthMatrix(realMatrixType const& data)
-        :mHInvSqrt(data.cols()),mNorm(.1)
+        :mHInvSqrt(data.cols())
         {
-            computeBWSilvermanRule(data,mHInvSqrt,mNorm);
-        }
-
-        /**
-         * \brief Compute the normalisation factor
-         * \return normalisation factor
-         *
-         * This function returns the |H|^{-1/2}
-         */
-        realScalarType norm() const
-        {
-            return mNorm;
+            computeBWSilvermanRule(data,mHInvSqrt);
         }
 
         /**
@@ -71,9 +60,8 @@ namespace kde
          * \param bandwidthMatrix output diagonal bandwidth matrix
          */
         void computeBWSilvermanRule(realMatrixType const& data,
-            bandwidhtMatrixType & bandwidthMatrix, realScalarType & norm)
+            bandwidhtMatrixType & bandwidthMatrix)
         {
-            norm = 1;
             for(indexType i=0;i<data.cols();++i)
             {
                 //find std-dvn of each dimension
@@ -87,12 +75,10 @@ namespace kde
                 realScalarType(-1.)/realScalarType(numDims+4.) )
                     * std::pow(count,realScalarType(1.)/realScalarType(numDims+4.) )
                     / sigma ;
-                norm *= bandwidthMatrix(i);
             }
         }
 
         bandwidhtMatrixType mHInvSqrt; /**< H^{-1/2} */
-        realScalarType mNorm; /**< |H|^{-1/2} */
     };
 
 }//namespace kde
