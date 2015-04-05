@@ -16,8 +16,7 @@ int testGaussian()
         sqSum += x(i)*x(i);
     }
 
-    realScalarType kernelVal = std::exp(-0.5*sqSum)
-        *std::pow(realScalarType(2.*M_PI),realScalarType(-numDims*0.5));
+    realScalarType kernelVal = -0.5*sqSum;
 
     realScalarType kernelValTest = kernelType::compute(x);
 

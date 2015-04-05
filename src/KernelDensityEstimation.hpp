@@ -39,28 +39,31 @@ namespace kde
         }
 
         /**
-         * \brief A function that returns the PDF at the spcified point
-         * \param x the point at which the PDF is sought
-         * \return the value of the PDF
+         * \brief A function that returns the log-PDF at the spcified point
+         * \param x the point at which the log-PDF is sought
+         * \return the value of the log-PDF
          */
         realScalarType compute(realVectorType const& x)
         {
-            realScalarType pdf = 0;
-            neighbourIndexVectorType nIVect = mNeighbours.neighbours(x);
+            assert(x.rows() == mData.cols());
+            realScalarType logPdf = 0;
+            neighbourIndexVectorType nIVect = mNeighbours.indices(x);
             for(indexType i=0;i<nIVect.rows();++i)
             {
-                indexType ni = nIVect(i)
-                pdf += kernelType::compute((x - mData.col(ni)));
+                indexType ni = nIVect(i);
+                realVectorType xi = mData.row(ni);
+                assert(x.rows() == xi.rows());
+                logPdf += kernelType::compute((x - xi));
             }
-            pdf /= (realScalarType)nIVect.rows();
-            return pdf;
+            logPdf /= (realScalarType)nIVect.rows();
+            return logPdf;
         }
 
     private:
         realMatrixType mData; /**< data */
         bandwidthType mBandwidth; /**< bandwidth matrix */
         neighboursType mNeighbours; /**< neighbours */
-    }
+    };
 }//namespace kde
 
 #endif //KDE_KERNELDENSITYESTIMATION_HPP

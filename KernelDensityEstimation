@@ -13,5 +13,6 @@
 #include "src/Gaussian.hpp"
 #include "src/DiagonalBandwidthMatrix.hpp"
 #include "src/AllNeighbours.hpp"
+#include "src/KernelDensityEstimation.hpp"
 
 #endif//KERNEL_DENSITY_ESTIMATION_MODULE

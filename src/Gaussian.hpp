@@ -33,15 +33,14 @@ namespace kde
         typedef Eigen::Matrix<realScalarType,Eigen::Dynamic,1> realVectorType;
 
         /**
-         * \brief A function that returns the value of the Gaussian kernel
+         * \brief A function that returns the log of the Gaussian kernel
          * \param x the point at wich the kernel is sought
-         * \return the value of the kernel sought
+         * \return the log of the kernel sought
          */
         static realScalarType compute(realVectorType const & x)
         {
             assert(x.rows()>0);
-            return std::exp(-0.5 * x.squaredNorm())
-                *std::pow(realScalarType(2*M_PI), realScalarType(-x.rows()*0.5));
+            return -0.5 * x.squaredNorm();
         }
     };
 
