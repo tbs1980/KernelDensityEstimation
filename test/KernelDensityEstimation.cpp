@@ -168,11 +168,13 @@ int main()
 {
     int ret = 0;
 
-    //ret += testGaussAllNeighbours<float>();
+    ret += testGaussAllNeighbours<float>();
     ret += testGaussAllNeighbours<double>();
-    //ret += testGaussAllNeighbours<long double>();
+    ret += testGaussAllNeighbours<long double>();
 
+    ret += testGaussNearestNeighboursKDTree<float>();
     ret += testGaussNearestNeighboursKDTree<double>();
+    ret += testGaussNearestNeighboursKDTree<long double>();
 
     return ret;
 }

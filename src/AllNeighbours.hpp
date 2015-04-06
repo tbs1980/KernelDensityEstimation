@@ -3,6 +3,16 @@
 
 namespace kde
 {
+    /**
+     * \class AllNeighbours
+     *
+     * \brief A class that returs all neighbours of a point
+     *
+     * \tparam _realScalarType real floating point type
+     *
+     * This class returns all points in the data for pdf estimation. All points
+     * are considered to be neighbours.
+     */
     template<typename _realScalarType>
     class AllNeighbours
     {
@@ -13,6 +23,10 @@ namespace kde
         typedef typename realMatrixType::Index indexType;
         typedef std::vector<size_t> neighbourIndexVectorType;
 
+        /**
+         * \brief A constructor that sets up the class
+         * \param data input data
+         */
         explicit AllNeighbours(realMatrixType const & data)
         :mNIVect(data.rows()),mNumDims(data.cols())
         {
@@ -37,8 +51,8 @@ namespace kde
         }
 
     private:
-        neighbourIndexVectorType mNIVect;
-        indexType mNumDims;
+        neighbourIndexVectorType mNIVect; /**< neighbour indices */
+        indexType mNumDims; /**< number of dimensions */
 
     };
 

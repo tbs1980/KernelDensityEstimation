@@ -86,7 +86,7 @@ int testNearestNeighboursKDTRee()
         samples.row(i) = samp;
     }
 
-    neighboursType nbkdt(samples,1);
+    neighboursType nbkdt(samples);
 
     realVectorType query = glp.generate();
 

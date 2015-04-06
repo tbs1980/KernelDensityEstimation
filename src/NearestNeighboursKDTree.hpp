@@ -3,6 +3,17 @@
 
 namespace kde
 {
+    /**
+     * \class NearestNeighboursKDTree
+     *
+     * \brief A class for computing nearest neighbours using k-d tree
+     *
+     * \tparam _realScalarType real floating point type
+     *
+     * This class computes the nearest neighbours using k-d tree. The number of
+     * neigbours can be fixed or they are can be comuted using a specified
+     * radius.
+     */
     template<typename _realScalarType>
     class NearestNeighboursKDTree
     {
@@ -17,13 +28,22 @@ namespace kde
         typedef nanoflann::RadiusResultSet<realScalarType,size_t> resultSetType;
         typedef nanoflann::KDTreeEigenMatrixAdaptor< realMatrixType >  KDTreeType;
 
-        NearestNeighboursKDTree(realMatrixType const & data)
+        /**
+         * \brief A constructor that sets up the nearest neighbours
+         * \param data input data
+         */
+        explicit NearestNeighboursKDTree(realMatrixType const & data)
         :mKDTree(data.cols(),data,10),mNumDims(data.cols()),mRadius(1.)
         {
             mKDTree.index->buildIndex();
             mRadius = getRadius(data);
         }
 
+        /**
+         * \brief A function that retures the indices of the nearest neighbours
+         * \param x point for which neighbours are sought
+         * \return a vector of indices of nearest neighbours
+         */
         neighbourIndexVectorType indices(realVectorType const& x)
         {
             assert(x.rows() == mNumDims);
@@ -33,6 +53,11 @@ namespace kde
 
     private:
 
+        /**
+         * \brief A function that returns the indices of k nearest neighbours
+         * \param x point for which neighbours are sought
+         * \return a vector of indices of nearest neighbours
+         */
         neighbourIndexVectorType knnSearch(realVectorType const& x)
         {
             const size_t num_results = 2000;
@@ -44,6 +69,11 @@ namespace kde
             return ret_indexes;
         }
 
+        /**
+         * \brief A function that returns the indices of nearest neighbours within a radius
+         * \param x point for which neighbours are sought
+         * \return a vector of indices of nearest neighbours
+         */
         neighbourIndexVectorType radiusSearch(realVectorType const& x)
         {
             std::vector<std::pair<size_t,realScalarType> > indices_dists;
@@ -60,6 +90,11 @@ namespace kde
 
         }
 
+        /**
+         * \brief A function for computing the radius for nearest neighbours
+         * \param data input data
+         * \return radius of nearest neighbours
+         */
         realScalarType getRadius(realMatrixType const & data)
         {
             realVectorType sigma(data.cols());
@@ -78,9 +113,9 @@ namespace kde
             return std::sqrt(sigma.rows())*sigmaVal;
         }
 
-        KDTreeType mKDTree;
-        indexType mNumDims;
-        realScalarType mRadius;
+        KDTreeType mKDTree; /**< k-d tree */
+        indexType mNumDims; /**< number of dimensions */
+        realScalarType mRadius; /**< radius of the nearest neighbours*/
     };
 }
 
