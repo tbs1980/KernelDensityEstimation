@@ -8,8 +8,10 @@ ENDIF()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 FIND_PACKAGE(Eigen3 REQUIRED)
+find_package(nanoflann REQUIRED)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${NANOFLANN_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra -Wfatal-errors")

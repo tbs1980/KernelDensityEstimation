@@ -116,6 +116,8 @@ int main()
     int ret = 0;
 
     ret += testGaussAllNeighbours<float>();
+    ret += testGaussAllNeighbours<double>();
+    ret += testGaussAllNeighbours<long double>();
 
     return ret;
 }

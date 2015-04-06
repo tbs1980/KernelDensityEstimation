@@ -1,11 +1,9 @@
 #include <KernelDensityEstimation>
 
 #include <random>
-#include <fstream>
-#include <iomanip>
 
 template<typename _realScalarType>
-class GaussPost
+class GaussLogPost
 {
 public:
     typedef _realScalarType realScalarType;
@@ -14,7 +12,7 @@ public:
     typedef Eigen::LLT<realMatrixType> LLTType;
     typedef typename realVectorType::Index indexType;
 
-    GaussPost(realVectorType const& mu,realMatrixType const& sigmaInv,unsigned long seed)
+    GaussLogPost(realVectorType const& mu,realMatrixType const& sigmaInv,unsigned long seed)
     :mMu(mu),mSigmaInv(sigmaInv),mGen(seed)
     {
         assert(mMu.rows() == mSigmaInv.rows() );
@@ -29,7 +27,7 @@ public:
         mChol = lltOfSigmaInv.matrixL();
     }
 
-    realScalarType logPost(realVectorType const& x) const
+    realScalarType compute(realVectorType const& x) const
     {
         return -0.5*(mMu-x).transpose()*mSigmaInv*(mMu-x);
     }
@@ -58,64 +56,55 @@ private:
     realMatrixType mChol;
 };
 
-int testInit()
+template<typename realScalarType>
+int testNearestNeighboursKDTRee()
 {
-    typedef double realScalarType;
-    typedef kde::GaussianKDE<realScalarType> kernelDensityEstimationType;
-    typedef kernelDensityEstimationType::realMatrixType realMatrixType;
-    typedef kernelDensityEstimationType::realVectorType realVectorType;
-    typedef GaussPost<realScalarType> GaussPostType;
-    typedef realMatrixType::Index indexType;
+    typedef GaussLogPost<realScalarType> GaussLogPostType;
+    typedef typename GaussLogPostType::realMatrixType realMatrixType;
+    typedef typename GaussLogPostType::realVectorType realVectorType;
+    typedef typename GaussLogPostType::indexType indexType;
+    typedef kde::NearestNeighboursKDTree<realScalarType> neighboursType;
+    typedef typename neighboursType::neighbourIndexVectorType neighbourIndexVectorType;
 
     //define the Gaussian posterior
     const indexType numDims=10;
     realMatrixType sigmaInv = realMatrixType::Identity(numDims,numDims);
-    realVectorType mu = realVectorType::Zero(numDims);
-    GaussPostType gp(mu,sigmaInv,1234l);
 
-    //samples and dimensionality
+    realVectorType mu = realVectorType::Zero(numDims);
+
+
+    GaussLogPostType glp(mu,sigmaInv,1234l);
+
+    //number of samples
     const indexType numSamples=3000;
 
-
     //generate samples
-    std::ofstream outFile;
-    outFile.open("ndSamples.txt",std::ios::trunc);
-
     realMatrixType samples(numSamples,numDims);
     for(indexType i=0;i<numSamples;++i)
     {
-        realVectorType samp = gp.generate();
+        realVectorType samp = glp.generate();
         samples.row(i) = samp;
-        /*
-        for(indexType j=0;j<samp.rows()-1;++j)
-        {
-            outFile<<std::setprecision(10)<<samp(j)<<",";
-        }
-        outFile<<std::setprecision(10)<<samp(samp.rows()-1)<<std::endl;
-        */
     }
-    outFile.close();
 
-    kernelDensityEstimationType kde(samples);
+    neighboursType nbkdt(samples);
 
-    for(indexType i=0;i<numSamples;++i)
+    realVectorType query = glp.generate();
+
+    neighbourIndexVectorType ni = nbkdt.indices(query);
+
+    for(size_t i=0;i<ni.size();++i)
     {
-        realVectorType samp = gp.generate();
-
-        for(indexType j=0;j<samp.rows();++j)
-        {
-            std::cout<<samp(j)<<",";
-        }
-        std::cout<<gp.logPost(samp)<<","<<std::log(kde.PDF(samp))<<std::endl;
-
+        std::cout<<i<<"\t"<<ni[i]<<std::endl;
     }
 
     return EXIT_SUCCESS;
 }
 
-int main(void)
+int main()
 {
     int ret = 0;
-    ret += testInit();
-    return 0;
+
+    ret += testNearestNeighboursKDTRee<float>();
+
+    return ret;
 }
