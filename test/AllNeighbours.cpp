@@ -20,14 +20,14 @@ int testIndices()
 
     neighbourIndexVectorType nbInds = nb.indices(x);
 
-    if(nbInds.rows() != numSamples)
+    if(nbInds.size() != numSamples)
     {
         return EXIT_FAILURE;
     }
 
-    for(indexType i=0;i<numSamples;++i)
+    for(size_t i=0;i<numSamples;++i)
     {
-        if(nbInds(i)  != i)
+        if(nbInds[i]  != i)
         {
             return EXIT_FAILURE;
         }

@@ -86,16 +86,18 @@ int testNearestNeighboursKDTRee()
         samples.row(i) = samp;
     }
 
-    neighboursType nbkdt(samples);
+    neighboursType nbkdt(samples,1);
 
     realVectorType query = glp.generate();
 
-    neighbourIndexVectorType ni = nbkdt.indices(query);
+    neighbourIndexVectorType nbInds = nbkdt.indices(query);
 
-    for(size_t i=0;i<ni.size();++i)
+    /*
+    for(size_t i=0;i<nbInds.size();++i)
     {
-        std::cout<<i<<"\t"<<ni[i]<<std::endl;
+        std::cout<<i<<"\t"<<nbInds[i]<<std::endl;
     }
+    */
 
     return EXIT_SUCCESS;
 }
@@ -105,6 +107,8 @@ int main()
     int ret = 0;
 
     ret += testNearestNeighboursKDTRee<float>();
+    ret += testNearestNeighboursKDTRee<double>();
+    ret += testNearestNeighboursKDTRee<long double>();
 
     return ret;
 }

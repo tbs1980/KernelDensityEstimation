@@ -48,15 +48,18 @@ namespace kde
             assert(x.rows() == mData.cols());
             realScalarType logPdf = 0;
             neighbourIndexVectorType nIVect = mNeighbours.indices(x);
-            for(indexType i=0;i<nIVect.rows();++i)
+            for(size_t i=0;i<nIVect.size();++i)
             {
-                indexType ni = nIVect(i);
+                indexType ni = (indexType) nIVect[i];
                 realVectorType xi = mData.row(ni);
-                assert(x.rows() == xi.rows());
-                logPdf += kernelType::compute((x - xi));
+                xi -= x;
+                mBandwidth.scale(xi);
+                logPdf += kernelType::compute(xi);
+                //logPdf += std::exp( kernelType::compute(xi) );
             }
-            logPdf /= (realScalarType)nIVect.rows();
+            logPdf /= (realScalarType) nIVect.size();
             return logPdf;
+            //return std::log(logPdf);
         }
 
     private:

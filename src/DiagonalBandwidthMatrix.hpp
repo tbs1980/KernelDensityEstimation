@@ -49,6 +49,17 @@ namespace kde
             x = x.cwiseProduct(mHInvSqrt);
         }
 
+        /**
+         * \brief Return the bandwidth matrix
+         * \return the bandwidth matrix
+         *
+         * This function returns the diagonal |H|^{-1/2} matrix
+         */
+        bandwidhtMatrixType const & bandwidth() const
+        {
+            return mHInvSqrt;
+        }
+
     private:
 
         /**

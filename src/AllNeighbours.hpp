@@ -11,7 +11,7 @@ namespace kde
         typedef Eigen::Matrix<realScalarType,Eigen::Dynamic,1> realVectorType;
         typedef Eigen::Matrix<realScalarType,Eigen::Dynamic,Eigen::Dynamic> realMatrixType;
         typedef typename realMatrixType::Index indexType;
-        typedef Eigen::Matrix<indexType,Eigen::Dynamic,1> neighbourIndexVectorType;
+        typedef std::vector<size_t> neighbourIndexVectorType;
 
         explicit AllNeighbours(realMatrixType const & data)
         :mNIVect(data.rows()),mNumDims(data.cols())
@@ -19,9 +19,9 @@ namespace kde
             assert(data.rows()>1);
             assert(data.cols()>0);
 
-            for(indexType i=0;i<mNIVect.rows();++i)
+            for(size_t i=0;i<mNIVect.size();++i)
             {
-                mNIVect(i) = i;
+                mNIVect[i] = i;
             }
         }
 
@@ -30,7 +30,7 @@ namespace kde
          * \param x the point for which neighbours are sought
          * \return The indices of (all) neighbours
          */
-        inline neighbourIndexVectorType indices(realVectorType const& x) const
+        inline neighbourIndexVectorType indices(realVectorType const& x)
         {
             assert(mNumDims == x.rows());
             return mNIVect;
