@@ -9,12 +9,18 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <random>
+#include <fstream>
+#include <iomanip>
+#include <chrono>
+#include <sstream>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
 #include <nanoflann.hpp>
 
+#include "src/utils.hpp"
 #include "src/Gaussian.hpp"
 #include "src/DiagonalBandwidthMatrix.hpp"
 #include "src/AllNeighbours.hpp"

@@ -20,3 +20,5 @@ ENABLE_TESTING()
 
 add_subdirectory(test)
 add_subdirectory(bench)
+add_subdirectory(data)
+add_subdirectory(demo)

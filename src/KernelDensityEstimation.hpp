@@ -62,6 +62,28 @@ namespace kde
             //return std::log(logPdf);
         }
 
+        /**
+         * \brief A function that returns the log-PDF at the spcified point
+         * \param x the point at which the log-PDF is sought
+         * \return the value of the log-PDF
+         */
+        realScalarType computePDF(realVectorType const& x)
+        {
+            assert(x.rows() == mData.cols());
+            realScalarType pdf = 0;
+            neighbourIndexVectorType nIVect = mNeighbours.indices(x);
+            for(size_t i=0;i<nIVect.size();++i)
+            {
+                indexType ni = (indexType) nIVect[i];
+                realVectorType xi = mData.row(ni);
+                xi -= x;
+                mBandwidth.scale(xi);
+                pdf += std::exp( kernelType::compute(xi) );
+            }
+            pdf /= (realScalarType) nIVect.size();
+            return pdf;
+        }
+
     private:
         realMatrixType mData; /**< data */
         bandwidthType mBandwidth; /**< bandwidth matrix */

@@ -1,36 +1,5 @@
 #include <KernelDensityEstimation>
 
-#include <chrono>
-#include <sstream>
-
-template<typename realScalarType>
-void split(const std::string &s, char delim, std::vector<realScalarType> & elems)
-{
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim))
-    {
-        elems.push_back(atof(item.c_str()));
-    }
-}
-
-template<typename realScalarType>
-void readData(std::string const& fileName,char delim,
-    std::vector< std::vector<realScalarType> > & data)
-{
-    std::cout<<"# reading data from "<<fileName<<std::endl;
-    std::ifstream inFile(fileName);
-    std::string line;
-    while( std::getline(inFile, line) )
-    {
-        std::vector<realScalarType> rowEntry;
-        split(line,delim,rowEntry);
-        data.push_back(rowEntry);
-    }
-
-    std::cout<<"# Data has "<<data.size()<<" rows and "
-        <<data[0].size()<<" columns "<<std::endl;
-}
 
 template<typename realScalarType>
 void GaussAllNbs(std::vector< std::vector<realScalarType> > const & dataIn)
@@ -110,7 +79,7 @@ int main(void)
     //read data
     std::string fileName("/arxiv/projects/zxcorr/mcmcChainsForLikelihoodTest_2D/2dpost.extract.dat");
     std::vector< std::vector<realScalarType> > dataIn;
-    readData<realScalarType>(fileName,',',dataIn);
+    utils::readData<realScalarType>(fileName,',',dataIn);
 
     GaussAllNbs<realScalarType>(dataIn);
 
