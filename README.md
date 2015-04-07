@@ -1,6 +1,7 @@
 # KernelDensityEstimation
 
 Kernel Density Estimation in c++
+![demo](demo/demoBiVariateGauss.png)
 
 # dependencies
 
