@@ -7,7 +7,7 @@ Kernel Density Estimation in c++
 
 We need [nanoflann](https://github.com/jlblancoc/nanoflann). This is a header only library.
 
-# duild instructions
+# build instructions
 
     $ git clone https://github.com/tbs1980/KernelDensityEstimation.git
     $ mkdir build
