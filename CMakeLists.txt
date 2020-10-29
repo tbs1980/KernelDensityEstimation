@@ -14,7 +14,11 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${NANOFLANN_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra -Wfatal-errors")
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra -Wfatal-errors")
+ELSE()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall")
+ENDIF()
 
 ENABLE_TESTING()
 
